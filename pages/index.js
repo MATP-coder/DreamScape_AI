@@ -1,57 +1,120 @@
-"use client";
+import Link from 'next/link'
 
-import Link from 'next/link';
-
-// Home page for DreamScape
-//
-// This page introduces visitors to the core value proposition.  A soft
-// gradient rooted in the brand palette leads the eye downward, while
-// concise copy explains the service.  A prominent call‑to‑action invites
-// users to begin their "Traumreise".  Below, three key benefits are
-// presented in a responsive grid.  Colours and typography are tuned for
-// readability in light and dark themes.
-
+/**
+ * Startseite für DreamScape
+ *
+ * Diese Seite nutzt eine erzählerische Struktur, um Besucher auf eine Reise
+ * mitzunehmen. Sie gliedert sich in drei Abschnitte: einen einladenden
+ * Hero‑Bereich, der die Besucher motiviert, ihren ersten Traum zu erzählen;
+ * einen Abschnitt, der die Schritte der sogenannten Heldenreise erklärt;
+ * sowie einen Free‑vs‑Premium‑Vergleich, der das Freemium‑Modell
+ * transparent darstellt. Durch durchdachte Gestaltung und stimmige Farben
+ * entsteht eine harmonische Benutzerführung, die Lust auf mehr macht.
+ */
 export default function Home() {
+  // Definition der Inhalte für die drei Reise‑Etappen. So bleiben Titel und
+  // Beschreibung sauber getrennt vom JSX‑Markup und können bei Bedarf
+  // leichter erweitert oder internationalisiert werden.
+  const steps = [
+    {
+      title: 'Der Ruf',
+      desc: 'Erzähle uns von deinem Traum, egal wie verrückt oder geheimnisvoll er wirkt.',
+    },
+    {
+      title: 'Die Reise',
+      desc: 'Unser Chat begleitet dich Schritt für Schritt, um dein Unterbewusstsein zu ergründen und ein Kunstwerk zu erschaffen.',
+    },
+    {
+      title: 'Die Belohnung',
+      desc: 'Du erhältst eine persönliche Interpretation und ein Traumkunstwerk, das du teilen oder sammeln kannst.',
+    },
+  ]
+
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Hero section */}
-      <section className="flex flex-col items-center justify-center flex-1 text-center bg-gradient-to-b from-brand-light via-white to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 px-4">
-        <h2 className="text-4xl md:text-6xl font-bold mb-4 text-gray-800 dark:text-gray-100">
-          Verwandle deine Träume in Kunst
-        </h2>
-        <p className="mb-6 text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-2xl">
-          Beschreibe deinen Traum und erhalte ein einzigartiges, KI‑generiertes Bild und eine faszinierende Traumdeutung.
+    <div className="max-w-5xl mx-auto px-4 md:px-6 py-12 space-y-20">
+      {/* Hero‑Bereich */}
+      <section className="text-center space-y-6">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-gray-100">
+          Begib dich auf deine Traumreise
+        </h1>
+        <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          Jeder Traum ist eine Geschichte – wir helfen dir, sie zu erzählen. Erkunde die tiefe
+          Bedeutung deiner Träume und erschaffe daraus einzigartige Kunst.
         </p>
-        <Link href="/chat">
-          <button className="px-6 py-3 md:px-8 md:py-4 bg-brand text-white text-lg rounded-lg shadow-md hover:bg-brand-dark transition-colors duration-300">
-            Jetzt Traumreise starten
-          </button>
+        <Link
+          href="/chat"
+          className="inline-block bg-brand text-white px-8 py-3 rounded-full text-base font-semibold hover:bg-brand-dark transition-colors"
+        >
+          Jetzt Traumreise starten
         </Link>
       </section>
 
-      {/* Feature highlights */}
-      <section className="bg-white dark:bg-gray-900 py-8 md:py-12">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 px-4">
-          <div className="text-center">
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">Sicher &amp; anonym</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
-              Deine Träume bleiben privat – wir speichern keine persönlichen Daten.
-            </p>
+      {/* Reise‑Etappen */}
+      <section className="space-y-10">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 text-center">
+          Deine Reise in drei Etappen
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {steps.map((item, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center text-center space-y-4 p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow"
+            >
+              <div className="h-12 w-12 flex items-center justify-center bg-brand text-white rounded-full text-xl font-bold">
+                {index + 1}
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                {item.title}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Free‑vs‑Premium Abschnitt */}
+      <section className="space-y-10">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 text-center">
+          Free vs. Premium
+        </h2>
+        <p className="text-center text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Wähle die Version, die zu dir passt. Starte kostenlos und entdecke die Möglichkeiten –
+          upgrade jederzeit für mehr Tiefe, Qualität und exklusive Features.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Free Karte */}
+          <div className="p-6 border rounded-lg bg-white dark:bg-gray-800 shadow space-y-4">
+            <h3 className="text-2xl font-bold text-brand dark:text-brand-light">Free</h3>
+            <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+              <li>• Grundlegende Traumdeutung</li>
+              <li>• Kleines Traumkunstwerk mit Wasserzeichen</li>
+              <li>• 1–2 Träume pro Woche</li>
+            </ul>
+            <Link
+              href="/chat"
+              className="inline-block mt-4 bg-brand text-white px-6 py-2 rounded-full hover:bg-brand-dark transition-colors"
+            >
+              Kostenlos ausprobieren
+            </Link>
           </div>
-          <div className="text-center">
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">KI‑basierte Analyse</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
-              Moderne GPT‑4 &amp; DALL·E KI‑Technologien für kreative Traumbilder und Interpretationen.
-            </p>
-          </div>
-          <div className="text-center">
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">Echte Kunstwerke</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
-              Erhalte dein Traumbild als hochauflösenden Download oder als Poster.
-            </p>
+          {/* Premium Karte */}
+          <div className="p-6 border rounded-lg bg-white dark:bg-gray-800 shadow space-y-4">
+            <h3 className="text-2xl font-bold text-brand dark:text-brand-light">Premium</h3>
+            <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+              <li>• Tiefenanalysen und persönliche Tipps</li>
+              <li>• Hochauflösende Kunstwerke ohne Wasserzeichen</li>
+              <li>• Mehrere Stile und Farbpaletten</li>
+              <li>• Download &amp; Posterbestellung</li>
+            </ul>
+            <Link
+              href="/chat?premium=true"
+              className="inline-block mt-4 bg-brand text-white px-6 py-2 rounded-full hover:bg-brand-dark transition-colors"
+            >
+              Premium testen
+            </Link>
           </div>
         </div>
       </section>
     </div>
-  );
+  )
 }
