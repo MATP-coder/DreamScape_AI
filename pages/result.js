@@ -1,66 +1,69 @@
-
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import Link from 'next/link'
 
+/**
+ * Ergebnis‑Seite
+ *
+ * Diese Seite zeigt das generierte Traumbild und die Interpretation. Je nach
+ * gebuchtem Plan (free oder premium) werden unterschiedliche Aktionen
+ * angeboten. Free‑Nutzer sehen einen Hinweis, dass Downloads und Poster
+ * exklusiv für Premium verfügbar sind, während Premium‑Nutzer direkte
+ * Buttons zum Download in hoher Auflösung und zur Poster‑Bestellung sehen.
+ */
 export default function Result() {
   const router = useRouter()
-  const { jobId } = router.query
-  const [data, setData] = useState(null)
-
-  useEffect(() => {
-    if (jobId) {
-      fetch(`/api/job?jobId=${jobId}`)
-        .then(res => res.json())
-        .then(setData)
-    }
-  }, [jobId])
-
-  const share = (platform) => {
-    const url = encodeURIComponent(window.location.href)
-    const text = encodeURIComponent("Schau dir mein KI-generiertes Traumbild an!")
-    if (platform === 'twitter') window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank')
-    if (platform === 'whatsapp') window.open(`https://wa.me/?text=${text}%20${url}`, '_blank')
-    if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank')
-  }
+  // Prüfe, ob Query‑Parameter ?premium=true gesetzt ist, um die
+  // Premium‑Ansicht zu aktivieren. Dieser Ansatz dient als einfache
+  // Demonstration eines Freemium‑Modells.
+  const isPremium = router.query.premium === 'true'
 
   return (
-    <div className="min-h-screen flex flex-col dark:bg-gray-900 dark:text-gray-100">
-      <div className="flex flex-col items-center justify-center flex-1 p-4 md:p-8 space-y-6">
-        <motion.h1 className="text-2xl md:text-3xl font-bold text-center" initial={{opacity:0}} animate={{opacity:1}}>Dein Traumbild</motion.h1>
-        {data?.image ? (
-          <motion.img 
-            src={data.image} 
-            alt="Traumbild" 
-            className="mb-6 max-w-full md:max-w-md border-8 border-white dark:border-gray-700 rounded-lg shadow-lg"
-            initial={{scale:0.9, opacity:0}} 
-            animate={{scale:1, opacity:1}}
-            transition={{duration:0.6}}
-          />
-        ) : (
-          <p className="italic">Lade Bild...</p>
-        )}
-        <motion.div 
-          className="w-full max-w-2xl text-left bg-white dark:bg-gray-800 p-4 md:p-6 rounded shadow space-y-3"
-          initial={{opacity:0, y:20}} 
-          animate={{opacity:1, y:0}}
-          transition={{delay:0.3}}
-        >
-          <h2 className="text-lg md:text-xl font-semibold flex items-center space-x-2">
-            <span>🌙</span><span>Traumdeutung</span>
-          </h2>
-          <p className="text-sm md:text-base">{data?.interpretation || 'Keine Traumdeutung vorhanden.'}</p>
-        </motion.div>
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
-          <button className="px-6 py-3 bg-blue-600 text-white rounded shadow hover:bg-blue-700 w-full sm:w-auto">High-Res Download</button>
-          <button className="px-6 py-3 bg-green-600 text-white rounded shadow hover:bg-green-700 w-full sm:w-auto">Poster bestellen</button>
-        </div>
-        <div className="flex space-x-2 sm:space-x-4 mt-4">
-          <button onClick={()=>share('twitter')} className="px-4 py-2 bg-blue-400 rounded text-white">Twitter</button>
-          <button onClick={()=>share('whatsapp')} className="px-4 py-2 bg-green-500 rounded text-white">WhatsApp</button>
-          <button onClick={()=>share('facebook')} className="px-4 py-2 bg-blue-800 rounded text-white">Facebook</button>
-        </div>
+    <div className="max-w-3xl mx-auto px-4 md:px-6 py-12 space-y-8 text-center">
+      <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">
+        Dein Traumbild
+      </h2>
+      {/* Bildcontainer – in einer echten Anwendung wird hier das generierte Bild eingefügt */}
+      <div className="mx-auto w-full max-w-md aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden" />
+      <div className="text-left text-gray-700 dark:text-gray-300 space-y-2">
+        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+          Traumdeutung
+        </h3>
+        <p>
+          Hier erscheint die Interpretation deines Traums basierend auf den gesammelten Details.
+          Diese Funktion ist in dieser Demo noch nicht voll implementiert.
+        </p>
       </div>
+      {/* Aktionen abhängig vom Plan */}
+      {isPremium ? (
+        <div className="flex flex-col md:flex-row justify-center items-center gap-4">
+          <button className="bg-brand text-white px-6 py-3 rounded-full hover:bg-brand-dark transition-colors">
+            High‑Res Download
+          </button>
+          <button className="bg-brand text-white px-6 py-3 rounded-full hover:bg-brand-dark transition-colors">
+            Poster bestellen
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Um das Bild in voller Auflösung herunterzuladen oder als Poster zu bestellen,
+            benötigst du die Premium‑Version.
+          </p>
+          <Link
+            href="/chat?premium=true"
+            className="inline-block bg-brand text-white px-6 py-3 rounded-full hover:bg-brand-dark transition-colors"
+          >
+            Upgrade auf Premium
+          </Link>
+        </div>
+      )}
+      {/* Teilen‑Button – unabhängig vom Plan */}
+      <Link
+        href="/"
+        className="inline-block border border-brand text-brand dark:text-brand-light px-6 py-3 rounded-full hover:bg-brand hover:text-white transition-colors mt-4"
+      >
+        Zurück zur Startseite
+      </Link>
     </div>
   )
 }
