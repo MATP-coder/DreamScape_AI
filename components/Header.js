@@ -60,7 +60,8 @@ export default function Header() {
           <Link href="/faq" className="text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-brand-light">
             FAQ
           </Link>
-          <Link href="/chat?premium=true" className="text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-brand-light">
+          {/* Premium‑Link leitet jetzt auf eine eigene Info‑Seite statt direkt zur Chat‑Strecke */}
+          <Link href="/premium" className="text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-brand-light">
             Premium
           </Link>
           {/* CTA Button */}
