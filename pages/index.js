@@ -115,6 +115,64 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Traum der Woche */}
+      <section className="space-y-10 pt-12">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 text-center">
+          Traum der Woche
+        </h2>
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
+          <img
+            src="/logo.png"
+            alt="Traum der Woche"
+            className="w-48 h-48 md:w-60 md:h-60 rounded-lg shadow-lg object-contain"
+          />
+          <div className="space-y-4 max-w-md text-gray-700 dark:text-gray-300">
+            <h3 className="text-2xl font-semibold text-brand dark:text-brand-light">
+              Der fliegende Wal
+            </h3>
+            <p>
+              Ein Nutzer träumte von einem gigantischen Wal, der über einer Stadt
+              schwebte und das Licht des Mondes reflektierte. Unsere KI schuf daraus ein
+              atemberaubendes Bild, das in unserer Community viral ging. Erzähle uns
+              deinen Traum – vielleicht bist du der nächste Star!
+            </p>
+            <a
+              href="/galerie"
+              className="inline-block bg-brand text-white px-6 py-2 rounded-full hover:bg-brand-dark transition-colors"
+            >
+              Mehr entdecken
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Zahlen & Fakten über Träume */}
+      <section className="space-y-10 pt-12">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 text-center">
+          Zahlen &amp; Fakten über Träume
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow space-y-2 text-center">
+            <h3 className="text-4xl font-extrabold text-brand dark:text-brand-light">2h</h3>
+            <p className="text-gray-700 dark:text-gray-300 text-sm">
+              So lange träumen wir durchschnittlich pro Nacht.
+            </p>
+          </div>
+          <div className="p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow space-y-2 text-center">
+            <h3 className="text-4xl font-extrabold text-brand dark:text-brand-light">95%</h3>
+            <p className="text-gray-700 dark:text-gray-300 text-sm">
+              der Träume sind nach 5 Minuten vergessen.
+            </p>
+          </div>
+          <div className="p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow space-y-2 text-center">
+            <h3 className="text-4xl font-extrabold text-brand dark:text-brand-light">12%</h3>
+            <p className="text-gray-700 dark:text-gray-300 text-sm">
+              der Menschen träumen in Schwarz‑Weiß.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
