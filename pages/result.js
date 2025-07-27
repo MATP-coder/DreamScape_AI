@@ -22,6 +22,12 @@ export default function Result() {
   const hasDiary = router.query.diary === 'true'
   const hasCommunity = router.query.community === 'true'
 
+  // Variantenanzahl und Stil/Qualität/Format auslesen
+  const variants = parseInt(router.query.variants || '1', 10)
+  const style = router.query.style || ''
+  const quality = router.query.quality || 'standard'
+  const format = router.query.format || 'square'
+
   // Auslesen der kreativitätsbezogenen Parameter
   const emotions = router.query.emotion ? String(router.query.emotion).split('-') : []
   const palette = router.query.color || ''
@@ -31,6 +37,12 @@ export default function Result() {
   // Zustände für generierte Bilder
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // Zustände für tiefere Interpretation und Q&A
+  const [deepInterpretation, setDeepInterpretation] = useState('')
+  const [qaMessages, setQaMessages] = useState([])
+  const [qaInput, setQaInput] = useState('')
+  const [loadingQA, setLoadingQA] = useState(false)
 
   // Hilfsfunktion: Erstelle eine einfache Beschreibung für das Bild
   function buildPrompt() {
@@ -99,7 +111,7 @@ export default function Result() {
       try {
         const prompt = buildPrompt()
         const res = await fetch(
-          `/api/generateImage?prompt=${encodeURIComponent(prompt)}&scenes=${isPremium ? numScenes : 1}`
+          `/api/generateImage?prompt=${encodeURIComponent(prompt)}&scenes=${isPremium ? numScenes : 1}&variants=${variants}&style=${encodeURIComponent(style)}&quality=${encodeURIComponent(quality)}&format=${encodeURIComponent(format)}`
         )
         const data = await res.json()
         if (data.images) {
@@ -112,6 +124,26 @@ export default function Result() {
       }
     }
     fetchImages()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Hole tiefere Interpretation beim Laden
+  useEffect(() => {
+    async function fetchInterpretation() {
+      try {
+        const prompt = buildPrompt()
+        const res = await fetch('/api/interpret', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt }),
+        })
+        const data = await res.json()
+        if (data.interpretation) setDeepInterpretation(data.interpretation)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    fetchInterpretation()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -133,8 +165,8 @@ export default function Result() {
         }
       >
         {loading
-          ? // Placeholder während der Ladephase
-            [...Array(total)].map((_, i) => (
+          ?
+            [...Array(total * variants)].map((_, i) => (
               <div
                 key={i}
                 className={
@@ -145,16 +177,28 @@ export default function Result() {
               />
             ))
           : images && images.length > 0
-          ? images.map((url, i) => (
-              <div key={i} className="relative w-full h-0" style={{ paddingBottom: isComic ? '133%' : '100%' }}>
-                <Image
-                  src={url}
-                  alt={`Traumbild ${i + 1}`}
-                  fill
-                  className="rounded-lg object-cover"
-                />
-              </div>
-            ))
+          ? images.map((url, i) => {
+              const isBlocked = !isPremium && i >= variants // block extra variants for free
+              return (
+                <div key={i} className="relative w-full h-0" style={{ paddingBottom: isComic ? '133%' : '100%' }}>
+                  {isBlocked ? (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-full h-full bg-gray-300 dark:bg-gray-800 rounded-lg blur-sm"></div>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-center text-gray-800 dark:text-gray-200 font-medium">Nur Premium</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <Image
+                      src={url}
+                      alt={`Traumbild ${i + 1}`}
+                      fill
+                      className="rounded-lg object-cover"
+                    />
+                  )}
+                </div>
+              )
+            })
           : null}
       </div>
       {/* Traumdeutung */}
@@ -163,6 +207,13 @@ export default function Result() {
           Traumdeutung
         </h3>
         <p>{buildInterpretation()}</p>
+        {deepInterpretation && (
+          <div className="mt-4 space-y-2 text-sm">
+            {deepInterpretation.split('\n').map((para, idx) => (
+              <p key={idx}>{para}</p>
+            ))}
+          </div>
+        )}
       </div>
       {/* Tagebuch und Community */}
       {isPremium && (hasDiary || hasCommunity) && (
@@ -221,6 +272,65 @@ export default function Result() {
         >
           Galerie ansehen
         </Link>
+      </div>
+      {/* Interaktiver Modus: Nutzer kann weitere Fragen zur Deutung stellen */}
+      <div className="space-y-4">
+        <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Frag den Traumexperten</h4>
+        <div className="flex flex-col gap-2">
+          {qaMessages.map((msg, idx) => (
+            <div key={idx} className={`text-sm ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+              <span
+                className={`inline-block px-3 py-2 rounded-lg ${
+                  msg.role === 'user'
+                    ? 'bg-brand text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                }`}
+              >
+                {msg.content}
+              </span>
+            </div>
+          ))}
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault()
+              if (!qaInput.trim() || loadingQA) return
+              const newMessages = [...qaMessages, { role: 'user', content: qaInput.trim() }]
+              setQaMessages(newMessages)
+              setQaInput('')
+              setLoadingQA(true)
+              try {
+                const res = await fetch('/api/interpret', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ prompt: buildPrompt(), question: qaInput.trim() }),
+                })
+                const data = await res.json()
+                const answer = data.interpretation || 'Entschuldigung, darauf habe ich keine Antwort.'
+                setQaMessages([...newMessages, { role: 'assistant', content: answer }])
+              } catch (err) {
+                setQaMessages([...newMessages, { role: 'assistant', content: 'Es ist ein Fehler aufgetreten.' }])
+              } finally {
+                setLoadingQA(false)
+              }
+            }}
+            className="flex gap-2"
+          >
+            <input
+              type="text"
+              value={qaInput}
+              onChange={(e) => setQaInput(e.target.value)}
+              placeholder="Frage zur Interpretation stellen…"
+              className="flex-1 px-3 py-2 rounded border dark:bg-gray-800 dark:border-gray-700"
+            />
+            <button
+              type="submit"
+              disabled={!qaInput.trim() || loadingQA}
+              className="bg-brand text-white px-4 py-2 rounded disabled:opacity-50"
+            >
+              Fragen
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   )
