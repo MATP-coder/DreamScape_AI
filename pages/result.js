@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
 
 /**
  * Ergebnis‑Seite
@@ -26,8 +28,28 @@ export default function Result() {
   const perspective = router.query.perspective || ''
   const moodValue = parseInt(router.query.mood || '50', 10)
 
-  // Erstellen einer einfachen Interpretation basierend auf den Eingaben.
-  // In einer echten Anwendung würden hier KI‑Modelle hinzugezogen.
+  // Zustände für generierte Bilder
+  const [images, setImages] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Hilfsfunktion: Erstelle eine einfache Beschreibung für das Bild
+  function buildPrompt() {
+    const parts = []
+    if (emotions.length) {
+      parts.push(`Emotionen: ${emotions.join(', ')}`)
+    }
+    if (palette) {
+      parts.push(`Farbpalette: ${palette}`)
+    }
+    if (perspective) {
+      parts.push(`Perspektive: ${perspective}`)
+    }
+    const moodDesc = moodValue <= 33 ? 'ruhige Stimmung' : moodValue >= 66 ? 'chaotische Stimmung' : 'ausgewogene Stimmung'
+    parts.push(moodDesc)
+    return parts.join(', ')
+  }
+
+  // Erstelle eine einfache Interpretation basierend auf den Eingaben.
   function buildInterpretation() {
     const parts = []
     if (emotions.length) {
@@ -70,24 +92,30 @@ export default function Result() {
     return parts.join(' ')
   }
 
-
-  // Hilfsfunktion zum Rendern von Bildplatzhaltern. In einer echten
-  // Anwendung würden hier die generierten Bilder angezeigt. Bei Comic‑Modus
-  // zeigen wir bis zu 5 Panels in einer Reihe, ansonsten ein Grid.
-  const placeholders = []
-  const total = Math.max(1, isPremium ? numScenes : 1)
-  for (let i = 0; i < total; i++) {
-    placeholders.push(
-      <div
-        key={i}
-        className={
-          isComic
-            ? 'w-full aspect-[3/4] bg-gray-200 dark:bg-gray-700 rounded-lg'
-            : 'w-full aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg'
+  // Bilder abrufen, wenn die Komponente geladen wird
+  useEffect(() => {
+    async function fetchImages() {
+      setLoading(true)
+      try {
+        const prompt = buildPrompt()
+        const res = await fetch(
+          `/api/generateImage?prompt=${encodeURIComponent(prompt)}&scenes=${isPremium ? numScenes : 1}`
+        )
+        const data = await res.json()
+        if (data.images) {
+          setImages(data.images)
         }
-      />
-    )
-  }
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchImages()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const total = Math.max(1, isPremium ? numScenes : 1)
 
   return (
     <div className="max-w-4xl mx-auto px-4 md:px-6 py-12 space-y-8">
@@ -104,7 +132,30 @@ export default function Result() {
             : ''
         }
       >
-        {placeholders}
+        {loading
+          ? // Placeholder während der Ladephase
+            [...Array(total)].map((_, i) => (
+              <div
+                key={i}
+                className={
+                  isComic
+                    ? 'w-full aspect-[3/4] bg-gray-200 dark:bg-gray-700 rounded-lg'
+                    : 'w-full aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg'
+                }
+              />
+            ))
+          : images && images.length > 0
+          ? images.map((url, i) => (
+              <div key={i} className="relative w-full h-0" style={{ paddingBottom: isComic ? '133%' : '100%' }}>
+                <Image
+                  src={url}
+                  alt={`Traumbild ${i + 1}`}
+                  fill
+                  className="rounded-lg object-cover"
+                />
+              </div>
+            ))
+          : null}
       </div>
       {/* Traumdeutung */}
       <div className="text-left text-gray-700 dark:text-gray-300 space-y-2">
@@ -118,14 +169,12 @@ export default function Result() {
         <div className="space-y-2 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700">
           {hasDiary && (
             <p className="text-sm text-gray-700 dark:text-gray-300">
-              Dein Traum wurde in deinem persönlichen Tagebuch gespeichert. Du kannst ihn später in
-              deiner Galerie nachlesen.
+              Dein Traum wurde in deinem persönlichen Tagebuch gespeichert. Du kannst ihn später in deiner Galerie nachlesen.
             </p>
           )}
           {hasCommunity && (
             <p className="text-sm text-gray-700 dark:text-gray-300">
-              Dein Traum ist jetzt anonym in der Community sichtbar. Lass dich von den Träumen
-              anderer inspirieren und gib Feedback.
+              Dein Traum ist jetzt anonym in der Community sichtbar. Lass dich von den Träumen anderer inspirieren und gib Feedback.
             </p>
           )}
         </div>
@@ -148,8 +197,7 @@ export default function Result() {
             </p>
           )}
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Um das Bild in voller Auflösung herunterzuladen oder als Poster zu bestellen,
-            benötigst du die Premium‑Version.
+            Um das Bild in voller Auflösung herunterzuladen oder als Poster zu bestellen, benötigst du die Premium‑Version.
           </p>
           <Link
             href="/chat?premium=true"
