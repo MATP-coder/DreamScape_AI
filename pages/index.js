@@ -35,18 +35,27 @@ export default function Home() {
       {/* Hero‑Bereich */}
       <section className="text-center space-y-6">
         <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-gray-100">
-          Begib dich auf deine Traumreise
+          Wähle deine Traumreise
         </h1>
         <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          Jeder Traum ist eine Geschichte – wir helfen dir, sie zu erzählen. Erkunde die tiefe
-          Bedeutung deiner Träume und erschaffe daraus einzigartige Kunst.
+          Jeder Traum ist eine Geschichte – je genauer du sie beschreibst, desto magischer wird
+          das Ergebnis. Starte kostenlos mit drei Fragen oder wähle den Premium‑Modus für eine
+          grenzenlose Reise und extra Features.
         </p>
-        <Link
-          href="/chat"
-          className="inline-block bg-brand text-white px-8 py-3 rounded-full text-base font-semibold hover:bg-brand-dark transition-colors"
-        >
-          Jetzt Traumreise starten
-        </Link>
+        <div className="flex flex-wrap justify-center gap-4 mt-4">
+          <Link
+            href="/chat"
+            className="inline-block bg-brand text-white px-6 py-3 rounded-full text-base font-semibold hover:bg-brand-dark transition-colors"
+          >
+            Kostenlos starten
+          </Link>
+          <Link
+            href="/chat?premium=true"
+            className="inline-block bg-brand-dark text-white px-6 py-3 rounded-full text-base font-semibold hover:bg-brand transition-colors"
+          >
+            Premium starten
+          </Link>
+        </div>
       </section>
 
       {/* Reise‑Etappen */}
