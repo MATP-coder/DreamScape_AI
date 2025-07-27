@@ -1,24 +1,50 @@
-import OpenAI from 'openai'
+/**
+ * API‑Route zur Bildgenerierung
+ *
+ * Diese Route nutzt den OpenAI‑Image‑Endpoint, um ein oder mehrere
+ * Bilder aus einer vom Nutzer generierten Beschreibung zu erzeugen.
+ * Die API‑Keys werden aus der Umgebung gelesen (z. B. Vercel Env var
+ * OPENAI_API_KEY). Über die Query‑Parameter lassen sich Anzahl der
+ * Bilder (scenes) und die Beschreibung (prompt) steuern. Bei einem
+ * Fehler wird eine aussagekräftige Meldung zurückgegeben.
+ */
 export default async function handler(req, res) {
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  const { messages, style } = req.body
-  const dreamText = messages.map(m=>m.content).join(' ')
+  const {
+    prompt = '',
+    scenes = '1',
+  } = req.query
 
-  const interpretationPrompt = `Analysiere und interpretiere diesen Traum in einfacher, verständlicher Sprache: ${dreamText}`
-  const imagePrompt = `Ein ${style} Kunstwerk basierend auf diesem Traum: ${dreamText}. Kurz und prägnant beschreiben.`
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
+    return res.status(500).json({ error: 'OPENAI_API_KEY ist nicht gesetzt' })
+  }
 
-  const [interpretationResp, image] = await Promise.all([
-    client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "system", content: "Du bist ein kreativer Traumdeuter." }, { role: "user", content: interpretationPrompt }],
-      max_tokens: 300
-    }),
-    client.images.generate({
-      model: "dall-e-3",
-      prompt: imagePrompt,
-      size: "1024x1024"
+  const numImages = Math.min(parseInt(scenes, 10) || 1, 5) // Begrenze auf max. 5 Bilder
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'dall-e-3',
+        prompt: String(prompt).slice(0, 1000),
+        n: numImages,
+        size: '1024x1024',
+      }),
     })
-  ])
 
-  res.status(200).json({ url: image.data[0].url, interpretation: interpretationResp.choices[0].message.content })
+    if (!response.ok) {
+      const errorText = await response.text()
+      return res.status(response.status).json({ error: errorText })
+    }
+    const data = await response.json()
+    const images = (data?.data || []).map((item) => item.url)
+    return res.status(200).json({ images })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ error: 'Fehler bei der Bildgenerierung' })
+  }
 }
