@@ -9,12 +9,13 @@
  * Fehler wird eine aussagekräftige Meldung zurückgegeben.
  */
 export default async function handler(req, res) {
-  const {
-    prompt = '',
-    scenes = '1',
-  } = req.query
+  // Destructure query parameters. `prompt` enthält die Bildbeschreibung,
+  // `scenes` die gewünschte Anzahl an Bildern (max. 5).
+  const { prompt = '', scenes = '1' } = req.query
 
-  const apiKey = process.env.OPENAI_API_KEY
+  // Versuche den API‑Key aus verschiedenen Quellen zu lesen. Manche Deployment‑Umgebungen
+  // setzen Umgebungsvariablen mit dem Prefix `NEXT_PUBLIC_`, daher prüfen wir beides.
+  const apiKey = process.env.OPENAI_API_KEY || process.env.NEXT_PUBLIC_OPENAI_API_KEY
   if (!apiKey) {
     return res.status(500).json({ error: 'OPENAI_API_KEY ist nicht gesetzt' })
   }
