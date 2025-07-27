@@ -4,20 +4,29 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
+// Header component
+//
+// This component renders a responsive navigation bar with the DreamScape logo,
+// primary navigation links and a dark‑mode toggle.  It leverages the custom
+// brand colours defined in `tailwind.config.js` to ensure consistency across
+// the site.  The dark‑mode toggle persists the user’s preference in
+// `localStorage` and applies the appropriate theme classes to the root
+// document element.
+
 export default function Header() {
-  // Manage dark mode via localStorage and root class
+  // Track dark mode state
   const [darkMode, setDarkMode] = useState(false);
 
+  // Initialise theme on mount based on persisted preference
   useEffect(() => {
-    // On mount, read saved theme and apply
-    const saved = typeof window !== 'undefined' && localStorage.getItem('theme');
-    const prefersDark = saved === 'dark';
-    if (prefersDark) {
+    const savedTheme = typeof window !== 'undefined' && localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
       setDarkMode(true);
     }
   }, []);
 
+  // Toggle dark mode and persist the choice
   const toggleDarkMode = () => {
     const htmlEl = document.documentElement;
     if (darkMode) {
@@ -31,18 +40,34 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full py-6 bg-white dark:bg-gray-900 shadow">
-      <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          {/* Use next/image for optimized logo */}
-          <Image src="/logo.png" alt="DreamScape Logo" width={40} height={40} className="h-8 w-8 md:h-10 md:w-10" priority />
-          <h1 className="text-2xl font-bold text-blue-700 dark:text-blue-300">DreamScape</h1>
+    <header className="w-full bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center py-4">
+        {/* Logo and site title */}
+        <div className="flex items-center gap-3">
+          {/* Circular logo background to tie into the brand palette */}
+          <span className="p-2 bg-brand-light rounded-full">
+            <Image
+              src="/logo.png"
+              alt="DreamScape Logo"
+              width={40}
+              height={40}
+              className="h-8 w-8 md:h-10 md:w-10"
+            />
+          </span>
+          <h1 className="text-2xl font-bold text-brand dark:text-brand-light">DreamScape</h1>
         </div>
-        <nav className="space-x-4 md:space-x-6 flex items-center">
-          <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400">Home</Link>
-          <Link href="/chat" className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400">Traumreise starten</Link>
-          <Link href="/#" className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400">Preise</Link>
-          <Link href="/#" className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400">Kontakt</Link>
+
+        {/* Navigation links */}
+        <nav className="flex items-center space-x-6">
+          <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-brand-light transition-colors">
+            Home
+          </Link>
+          <Link href="/chat" className="text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-brand-light transition-colors">
+            Chat
+          </Link>
+          <Link href="/result" className="text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-brand-light transition-colors">
+            Ergebnisse
+          </Link>
           {/* Dark mode toggle button */}
           <button
             onClick={toggleDarkMode}
