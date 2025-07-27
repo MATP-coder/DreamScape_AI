@@ -20,6 +20,57 @@ export default function Result() {
   const hasDiary = router.query.diary === 'true'
   const hasCommunity = router.query.community === 'true'
 
+  // Auslesen der kreativitätsbezogenen Parameter
+  const emotions = router.query.emotion ? String(router.query.emotion).split('-') : []
+  const palette = router.query.color || ''
+  const perspective = router.query.perspective || ''
+  const moodValue = parseInt(router.query.mood || '50', 10)
+
+  // Erstellen einer einfachen Interpretation basierend auf den Eingaben.
+  // In einer echten Anwendung würden hier KI‑Modelle hinzugezogen.
+  function buildInterpretation() {
+    const parts = []
+    if (emotions.length) {
+      const emotionMap = {
+        Angst: 'Angst oder Unsicherheit',
+        Freude: 'Freude und Zufriedenheit',
+        Verwirrung: 'Verwirrung oder Ratlosigkeit',
+        Neugier: 'Neugier und Entdeckungsfreude',
+        Trauer: 'Trauer oder Verlust',
+        Wut: 'Wut oder Frustration',
+      }
+      const mapped = emotions
+        .map((e) => emotionMap[e] || e)
+        .join(', ')
+      parts.push(`Dein Traum spiegelt ${mapped} wider.`)
+    }
+    const moodDesc = moodValue <= 33 ? 'eine ruhige' : moodValue >= 66 ? 'eine chaotische' : 'eine ausgewogene'
+    const paletteMap = {
+      düster: 'düstere',
+      bunt: 'bunte',
+      pastell: 'pastellige',
+      kontrastreich: 'kontrastreiche',
+    }
+    if (paletteMap[palette]) {
+      parts.push(`Die ${moodDesc} Stimmung und die ${paletteMap[palette]} Farbgebung deuten auf deine aktuelle Gefühlslage hin.`)
+    } else {
+      parts.push(`Die ${moodDesc} Stimmung zeigt deine innere Balance.`)
+    }
+    const perspectiveMap = {
+      vogel: 'aus der Vogelperspektive',
+      nah: 'als Nahaufnahme',
+      first: 'aus der Ich‑Perspektive',
+    }
+    if (perspectiveMap[perspective]) {
+      parts.push(`Die gewählte Perspektive (${perspectiveMap[perspective]}) zeigt, aus welchem Blickwinkel du dein Unterbewusstsein betrachtest.`)
+    }
+    if (!parts.length) {
+      return 'Dein Traum weist auf verborgene Wünsche und Gedanken hin.'
+    }
+    return parts.join(' ')
+  }
+
+
   // Hilfsfunktion zum Rendern von Bildplatzhaltern. In einer echten
   // Anwendung würden hier die generierten Bilder angezeigt. Bei Comic‑Modus
   // zeigen wir bis zu 5 Panels in einer Reihe, ansonsten ein Grid.
@@ -60,10 +111,7 @@ export default function Result() {
         <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
           Traumdeutung
         </h3>
-        <p>
-          Hier erscheint die Interpretation deines Traums basierend auf den gesammelten Details.
-          Diese Funktion ist in dieser Demo noch nicht voll implementiert.
-        </p>
+        <p>{buildInterpretation()}</p>
       </div>
       {/* Tagebuch und Community */}
       {isPremium && (hasDiary || hasCommunity) && (
