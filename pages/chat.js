@@ -130,6 +130,14 @@ export default function Chat() {
       },
     ]
     setMessages(finalMessages)
+    // Baue ein Objekt aus allen gewählten Parametern. Zusätzlich wird der gesamte
+    // Gesprächsverlauf (nur Nutzerbeiträge) als prompt hinzugefügt, damit die
+    // nachfolgende Generierung die Story berücksichtigen kann.
+    const conversationText = msgs
+      .filter((m) => m.role === 'user')
+      .map((m) => m.content)
+      .join(' ')
+      .trim()
     const queryObj = {
       premium: isPremium ? 'true' : undefined,
       scenes: isPremium ? String(scenes) : undefined,
@@ -145,6 +153,7 @@ export default function Chat() {
       quality: quality.toLowerCase(),
       format: format.toLowerCase(),
       variants: isPremium ? '2' : '1',
+      prompt: conversationText || undefined,
     }
     const params = new URLSearchParams(
       Object.fromEntries(Object.entries(queryObj).filter(([, v]) => v !== undefined))
@@ -399,8 +408,7 @@ export default function Chat() {
                 </label>
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400 italic">
-                Deine Traumreise als Video!{' '}
-                <span className="font-medium text-brand">Coming soon</span>
+                Deine Traumreise als Video – erzeuge eine kurze Sequenz aus deinen Szenen.
               </div>
             </div>
           )}
@@ -464,11 +472,24 @@ export default function Chat() {
                   Senden
                 </button>
               </form>
+              {/* Upsell-Hinweis für Free-User */}
               {!isPremium && (
                 <p className="text-sm text-center text-gray-500 dark:text-gray-400 pt-2">
-                  Für tiefere Analyse & mehrere Szenen{' '}
+                  Für tiefere Analyse &amp; mehrere Szenen{' '}
                   <a href="/premium" className="text-brand underline">Premium freischalten</a>.
                 </p>
+              )}
+              {/* Beenden-Button für Premium-Nutzer: ermöglicht das manuelle Beenden der Reise */}
+              {isPremium && (
+                <div className="pt-4 text-center">
+                  <button
+                    type="button"
+                    onClick={() => endJourney(messages)}
+                    className="inline-block bg-brand text-white px-6 py-2 rounded-full hover:bg-brand-dark transition-colors"
+                  >
+                    Traumreise beenden
+                  </button>
+                </div>
               )}
             </>
           ) : null}

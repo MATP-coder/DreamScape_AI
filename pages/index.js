@@ -43,15 +43,17 @@ export default function Home() {
           grenzenlose Reise und extra Features.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-4">
+          {/* CTA für kostenlose Nutzer – dezente Farbe, um Premium hervorzuheben */}
           <Link
             href="/chat"
-            className="inline-block bg-brand text-white px-6 py-3 rounded-full text-base font-semibold hover:bg-brand-dark transition-colors"
+            className="inline-block bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-full text-base font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           >
             Kostenlos starten
           </Link>
+          {/* CTA für Premium – mit Goldton, um Exklusivität zu vermitteln */}
           <Link
             href="/chat?premium=true"
-            className="inline-block bg-brand-dark text-white px-6 py-3 rounded-full text-base font-semibold hover:bg-brand transition-colors"
+            className="inline-block bg-yellow-500 dark:bg-yellow-600 text-white px-6 py-3 rounded-full text-base font-semibold hover:bg-yellow-600 dark:hover:bg-yellow-500 transition-colors"
           >
             Premium starten
           </Link>
@@ -92,32 +94,32 @@ export default function Home() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Free Karte */}
-          <div className="p-6 border rounded-lg bg-white dark:bg-gray-800 shadow space-y-4">
-            <h3 className="text-2xl font-bold text-brand dark:text-brand-light">Free</h3>
+          <div className="p-6 border rounded-lg bg-gray-100 dark:bg-gray-800 shadow space-y-4 relative overflow-hidden">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Free</h3>
             <ul className="space-y-2 text-gray-600 dark:text-gray-300">
               <li>• Grundlegende Traumdeutung</li>
               <li>• Kleines Traumkunstwerk mit Wasserzeichen</li>
-              <li>• 1–2 Träume pro Woche</li>
+              <li>• 1 Traum pro Woche</li>
             </ul>
             <Link
               href="/chat"
-              className="inline-block mt-4 bg-brand text-white px-6 py-2 rounded-full hover:bg-brand-dark transition-colors"
+              className="inline-block mt-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
               Kostenlos ausprobieren
             </Link>
           </div>
           {/* Premium Karte */}
-          <div className="p-6 border rounded-lg bg-white dark:bg-gray-800 shadow space-y-4">
-            <h3 className="text-2xl font-bold text-brand dark:text-brand-light">Premium</h3>
-            <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+          <div className="p-6 border rounded-lg bg-yellow-100 dark:bg-yellow-700 shadow space-y-4 relative overflow-hidden">
+            <h3 className="text-2xl font-bold text-yellow-700 dark:text-yellow-200">Premium</h3>
+            <ul className="space-y-2 text-yellow-800 dark:text-yellow-100">
               <li>• Tiefenanalysen und persönliche Tipps</li>
               <li>• Hochauflösende Kunstwerke ohne Wasserzeichen</li>
-              <li>• Mehrere Stile und Farbpaletten</li>
-              <li>• Download &amp; Posterbestellung</li>
+              <li>• Mehrere Stile, Qualitätsstufen und Formate</li>
+              <li>• Download, Poster &amp; Video‑Sequenzen</li>
             </ul>
             <Link
               href="/chat?premium=true"
-              className="inline-block mt-4 bg-brand text-white px-6 py-2 rounded-full hover:bg-brand-dark transition-colors"
+              className="inline-block mt-4 bg-yellow-500 dark:bg-yellow-600 text-white px-6 py-2 rounded-full hover:bg-yellow-600 dark:hover:bg-yellow-500 transition-colors"
             >
               Premium testen
             </Link>
@@ -131,10 +133,11 @@ export default function Home() {
           Traum der Woche
         </h2>
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
+          {/* Traum der Woche – beeindruckendes Referenzbild */}
           <img
-            src="/logo.png"
-            alt="Traum der Woche"
-            className="w-48 h-48 md:w-60 md:h-60 rounded-lg shadow-lg object-contain"
+            src="/dreamofweek.png"
+            alt="Traum der Woche: Fliegender Wal"
+            className="w-48 h-48 md:w-60 md:h-60 rounded-lg shadow-lg object-cover"
           />
           <div className="space-y-4 max-w-md text-gray-700 dark:text-gray-300">
             <h3 className="text-2xl font-semibold text-brand dark:text-brand-light">

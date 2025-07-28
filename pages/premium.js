@@ -30,6 +30,10 @@ export default function PremiumPage() {
       title: 'Traum‑Tagebuch & Community',
       desc: 'Speichere deine Träume in deinem privaten Tagebuch und teile sie anonym in der Community.',
     },
+    {
+      title: 'Video‑Sequenzen',
+      desc: 'Lass aus deinen generierten Bildern eine kurze Traum‑Sequenz entstehen und erlebe deinen Traum in Bewegung.',
+    },
   ]
 
   return (

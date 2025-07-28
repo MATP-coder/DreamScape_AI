@@ -242,9 +242,10 @@ export default function Result() {
         <div className="space-y-2 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700">
           <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Deine Traum‑Videosequenz</h4>
           <p className="text-sm text-gray-700 dark:text-gray-300">
-            Ausgewählte Szenen werden zu einer kurzen Sequenz kombiniert. Eine echte Video‑Generierung folgt in einer späteren Version.
+            Aus deinen generierten Bildern entsteht hier eine kurze Sequenz. Genieße die
+            Bewegung und erlebe deinen Traum noch intensiver.
           </p>
-          <div className="flex overflow-x-auto gap-4 pt-2">
+          <div className="flex overflow-x-auto gap-4 pt-2 animate-pulse">
             {images.map((url, idx) => (
               <div key={idx} className="relative flex-shrink-0 w-40 h-40">
                 <Image src={url} alt={`Szene ${idx + 1}`} fill className="object-cover rounded" />
