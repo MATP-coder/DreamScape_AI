@@ -1,11 +1,15 @@
 "use client";
 
+import Link from 'next/link'
+
 // FAQ page
 //
 // Provides answers to common questions about DreamScape.  Each
 // question is highlighted and followed by a succinct answer.  The
 // layout respects the existing design language with responsive
-// typography and subtle colour contrasts.
+// typography and subtle colour contrasts.  Am Ende wird ein klarer
+// Aufruf zum Start der Traumreise platziert, damit Besucher direkt
+// loslegen können – entweder kostenlos oder im Premium‑Modus.
 
 export default function FAQ() {
   const faqs = [
@@ -41,6 +45,21 @@ export default function FAQ() {
               </p>
             </div>
           ))}
+        </div>
+        {/* Aufruf zum Start der Traumreise */}
+        <div className="mt-12 text-center flex flex-col md:flex-row justify-center gap-4">
+          <Link
+            href="/chat"
+            className="inline-block bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-full font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            Kostenlos starten
+          </Link>
+          <Link
+            href="/chat?premium=true"
+            className="inline-block bg-yellow-500 dark:bg-yellow-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-yellow-600 dark:hover:bg-yellow-500 transition-colors"
+          >
+            Premium starten
+          </Link>
         </div>
       </div>
     </div>

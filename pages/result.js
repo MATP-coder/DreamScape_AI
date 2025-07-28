@@ -22,6 +22,9 @@ export default function Result() {
   const hasDiary = router.query.diary === 'true'
   const hasCommunity = router.query.community === 'true'
 
+  // Videosequenz nur bei Premium: Parameter auslesen
+  const hasVideo = router.query.video === 'true'
+
   // Variantenanzahl und Stil/Qualität/Format auslesen
   const variants = parseInt(router.query.variants || '1', 10)
   const style = router.query.style || ''
@@ -43,6 +46,9 @@ export default function Result() {
   const [qaMessages, setQaMessages] = useState([])
   const [qaInput, setQaInput] = useState('')
   const [loadingQA, setLoadingQA] = useState(false)
+
+  // Ziel‑URL für eine neue Traumreise
+  const nextChat = isPremium ? '/chat?premium=true' : '/chat'
 
   // Hilfsfunktion: Erstelle eine einfache Beschreibung für das Bild
   function buildPrompt() {
@@ -109,7 +115,9 @@ export default function Result() {
     async function fetchImages() {
       setLoading(true)
       try {
-        const prompt = buildPrompt()
+        // Wenn im Query ein eigener Prompt (aus dem Chat) vorhanden ist, verwende diesen
+        const promptParam = router.query.prompt
+        const prompt = promptParam ? String(promptParam) : buildPrompt()
         const res = await fetch(
           `/api/generateImage?prompt=${encodeURIComponent(prompt)}&scenes=${isPremium ? numScenes : 1}&variants=${variants}&style=${encodeURIComponent(style)}&quality=${encodeURIComponent(quality)}&format=${encodeURIComponent(format)}`
         )
@@ -131,7 +139,8 @@ export default function Result() {
   useEffect(() => {
     async function fetchInterpretation() {
       try {
-        const prompt = buildPrompt()
+        const promptParam = router.query.prompt
+        const prompt = promptParam ? String(promptParam) : buildPrompt()
         const res = await fetch('/api/interpret', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -202,13 +211,11 @@ export default function Result() {
           : null}
       </div>
       {/* Traumdeutung */}
-      <div className="text-left text-gray-700 dark:text-gray-300 space-y-2">
-        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-          Traumdeutung
-        </h3>
-        <p>{buildInterpretation()}</p>
+      <div className="p-4 mt-4 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow space-y-3">
+        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Traumdeutung</h3>
+        <p className="text-gray-700 dark:text-gray-300 text-sm">{buildInterpretation()}</p>
         {deepInterpretation && (
-          <div className="mt-4 space-y-2 text-sm">
+          <div className="mt-2 space-y-2 text-sm text-gray-700 dark:text-gray-300">
             {deepInterpretation.split('\n').map((para, idx) => (
               <p key={idx}>{para}</p>
             ))}
@@ -230,31 +237,54 @@ export default function Result() {
           )}
         </div>
       )}
+      {/* Videosequenz für Premium */}
+      {isPremium && hasVideo && images && images.length > 0 && (
+        <div className="space-y-2 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700">
+          <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Deine Traum‑Videosequenz</h4>
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            Ausgewählte Szenen werden zu einer kurzen Sequenz kombiniert. Eine echte Video‑Generierung folgt in einer späteren Version.
+          </p>
+          <div className="flex overflow-x-auto gap-4 pt-2">
+            {images.map((url, idx) => (
+              <div key={idx} className="relative flex-shrink-0 w-40 h-40">
+                <Image src={url} alt={`Szene ${idx + 1}`} fill className="object-cover rounded" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {/* Aktionen abhängig vom Plan */}
       {isPremium ? (
-        <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-          <button className="bg-brand text-white px-6 py-3 rounded-full hover:bg-brand-dark transition-colors">
-            High‑Res Download
-          </button>
-          <button className="bg-brand text-white px-6 py-3 rounded-full hover:bg-brand-dark transition-colors">
-            Poster bestellen
-          </button>
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4">
+            <button className="bg-brand text-white px-6 py-3 rounded-full hover:bg-brand-dark transition-colors">
+              High‑Res Download
+            </button>
+            <button className="bg-brand text-white px-6 py-3 rounded-full hover:bg-brand-dark transition-colors">
+              Poster bestellen
+            </button>
+          </div>
+          {/* Neue Traumreise für Premium */}
+          <Link href={nextChat} className="inline-block bg-brand-dark text-white px-6 py-3 rounded-full hover:bg-brand transition-colors">
+            Neue Traumreise starten
+          </Link>
         </div>
       ) : (
-        <div className="space-y-4 text-center">
+        <div className="space-y-4 text-center flex flex-col items-center">
           {(numScenes > 1 || isComic || hasDiary || hasCommunity) && (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md">
               Die von dir ausgewählten Optionen (mehrere Szenen, Comic‑Modus, Tagebuch oder Community) sind Teil der Premium‑Version.
             </p>
           )}
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md">
             Um das Bild in voller Auflösung herunterzuladen oder als Poster zu bestellen, benötigst du die Premium‑Version.
           </p>
-          <Link
-            href="/chat?premium=true"
-            className="inline-block bg-brand text-white px-6 py-3 rounded-full hover:bg-brand-dark transition-colors"
-          >
+          <Link href="/chat?premium=true" className="inline-block bg-brand text-white px-6 py-3 rounded-full hover:bg-brand-dark transition-colors">
             Upgrade auf Premium
+          </Link>
+          {/* Neue Traumreise für Free */}
+          <Link href={nextChat} className="inline-block bg-gray-700 dark:bg-gray-200 text-white dark:text-gray-800 px-6 py-3 rounded-full hover:bg-gray-600 dark:hover:bg-gray-300 transition-colors">
+            Neue Traumreise starten
           </Link>
         </div>
       )}
