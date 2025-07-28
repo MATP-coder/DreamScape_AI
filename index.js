@@ -133,10 +133,11 @@ export default function Home() {
           Traum der Woche
         </h2>
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
+          {/* Traum der Woche – beeindruckendes Referenzbild */}
           <img
-            src="/logo.png"
-            alt="Traum der Woche"
-            className="w-48 h-48 md:w-60 md:h-60 rounded-lg shadow-lg object-contain"
+            src="/dreamofweek.png"
+            alt="Traum der Woche: Fliegender Wal"
+            className="w-48 h-48 md:w-60 md:h-60 rounded-lg shadow-lg object-cover"
           />
           <div className="space-y-4 max-w-md text-gray-700 dark:text-gray-300">
             <h3 className="text-2xl font-semibold text-brand dark:text-brand-light">
